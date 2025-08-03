@@ -24,14 +24,13 @@ def test_clarifier_module_integration():
     Tests that the ClarifierModule returns a valid, non-empty response.
     """
     # 1. Arrange
-    framework_principles = load_principles(PRINCIPLES_PATH)
-    assert framework_principles, "Framework principles file could not be loaded."
+    clarifier = ClarifierModule(PRINCIPLES_PATH)
+    assert clarifier.framework_principles, "Framework principles file could not be loaded."
     
-    clarifier = ClarifierModule()
     ambiguous_request = "Can you update the UI?"
 
     # 2. Act
-    result = clarifier.forward(user_request=ambiguous_request, principles=framework_principles)
+    result = clarifier.forward(user_request=ambiguous_request)
 
     # 3. Assert
     assert result is not None, "The clarifier returned a None object."
