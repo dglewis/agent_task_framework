@@ -3,7 +3,7 @@ import os
 
 class TaskClarificationSignature(dspy.Signature):
     """
-    Analyzes a user's request based on a set of framework principles and generates clarifying questions to resolve ambiguities.
+    You are a senior AI engineering assistant. Your role is to analyze a user's request and the provided framework principles. Your goal is to identify ambiguities and generate a concise list of clarifying questions. These questions should help a junior developer fully understand the task's objective, scope, deliverables, and success criteria.
     """
     framework_principles = dspy.InputField(desc="The core principles for deconstructing a user's task.")
     user_request = dspy.InputField(desc="The user's ambiguous or incomplete request.")
