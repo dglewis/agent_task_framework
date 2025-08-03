@@ -102,19 +102,44 @@ def main():
         gold_questions = example.clarifying_questions
         
         # Get the predicted questions from our module's output
-        predicted_questions = pred.clarifying_questions
+        # During optimization, pred might be the raw output or need different access
+        if hasattr(pred, 'clarifying_questions'):
+            predicted_questions = pred.clarifying_questions
+        elif hasattr(pred, 'answer'):
+            predicted_questions = pred.answer
+        else:
+            # Fallback: convert pred to string if it's not the expected format
+            predicted_questions = str(pred)
         
         # Get the original user request
         request = example.user_request
         
         # Ask the LLM to judge the prediction
-        result = validator(user_request=request, gold_standard_questions=gold_questions, generated_questions=predicted_questions)
-        
-        # Return True if the LLM says "Yes", False otherwise
-        return "yes" in result.is_comprehensive.lower()
+        try:
+            result = validator(user_request=request, gold_standard_questions=gold_questions, generated_questions=predicted_questions)
+            # Return True if the LLM says "Yes", False otherwise
+            return "yes" in result.is_comprehensive.lower()
+        except Exception as e:
+            # If validation fails, return False rather than crashing
+            print(f"Validation failed: {e}")
+            return False
 
     # --- Split data into training and development sets ---
     train_set, dev_set = train_set[:2], train_set[2:]
+
+    # --- Stage 3: Using the DSPy Compiler (BootstrapFewShot) ---
+    print("=== DSPy Optimization Process ===\n")
+    
+    # Create the optimizer
+    # Note: BootstrapFewShot is imported from dspy.teleprompt in newer versions
+    from dspy.teleprompt import BootstrapFewShot
+    optimizer = BootstrapFewShot(metric=validate_clarification, max_bootstrapped_demos=2, max_labeled_demos=2)
+    
+    # Compile our ClarifierModule using the training examples
+    print("Compiling the ClarifierModule using training examples...")
+    compiled_clarifier = optimizer.compile(clarifier, trainset=train_set, valset=dev_set)
+    
+    print("✅ Compilation complete!\n")
 
     # --- Example Usage ---
     # An example of an ambiguous user request
