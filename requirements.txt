@@ -1,0 +1,6 @@
+# Core dependencies
+dspy-ai==2.4.4
+ollama==0.2.1
+
+# For development and testing
+pytest
