@@ -11,7 +11,7 @@ PRINCIPLES_PATH = os.path.join(os.path.dirname(__file__), '..', 'docs', 'framewo
 
 # Check if the Ollama server is accessible before running tests
 try:
-    ollama_model = dspy.OllamaLocal(model=MODEL_NAME)
+    ollama_model = dspy.OllamaLocal(model=MODEL_NAME, max_tokens=2048)
     dspy.settings.configure(lm=ollama_model)
     ollama_model("test connection")
     ollama_is_running = True
