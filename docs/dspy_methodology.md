@@ -6,7 +6,7 @@ This document explains the process and reasoning behind refining our initial Age
 
 The standard way to interact with a Large Language Model (LLM) is through "prompt engineering"—manually tweaking a detailed prompt until it produces the desired output. This process is often brittle, inconsistent across different models, and hard to maintain.
 
-DSPy treats this differently. It allows us to **program** the LLM. We define a series of steps and constraints, and then we use a **DSPy optimizer (or "compiler")** to figure out the best possible prompt for our specific task.
+**DSPy**, which stands for **Declarative Self-improving Language Programs**, treats this differently. It allows us to **program** the LLM. We define a series of steps and constraints, and then we use a **DSPy optimizer (or "compiler")** to figure out the best possible prompt for our specific task.
 
 Our refinement process follows this philosophy.
 
