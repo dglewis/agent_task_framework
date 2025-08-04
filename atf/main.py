@@ -3,12 +3,20 @@ import os
 
 class TaskClarificationSignature(dspy.Signature):
     """
-    You are a senior AI engineering assistant. Your role is to analyze a user's request and the provided framework principles. Your goal is to identify ambiguities and generate a concise list of clarifying questions. These questions should help a junior developer fully understand the task's objective, scope, deliverables, and success criteria.
+    You are a senior AI engineering assistant. Generate exactly 4 clear, concise clarifying questions - one for each principle: Objective, Scope, Deliverable, and Success Criteria. 
+
+    Format your response as:
+    **OBJECTIVE:** [single clear question about the main goal]
+    **SCOPE:** [single clear question about boundaries/files/areas]  
+    **DELIVERABLE:** [single clear question about expected output]
+    **SUCCESS:** [single clear question about how to validate completion]
+
+    Keep each question under 20 words and focused on removing ambiguity.
     """
     framework_principles = dspy.InputField(desc="The core principles for deconstructing a user's task.")
     user_request = dspy.InputField(desc="The user's ambiguous or incomplete request.")
     
-    clarifying_questions = dspy.OutputField(desc="A comprehensive, numbered list of questions to fully clarify the user's request. You MUST ask at least one question for each of the four core principles: Objective, Scope, Deliverable, and Success Criteria.")
+    clarifying_questions = dspy.OutputField(desc="Exactly 4 clarifying questions in the specified format, one per principle.")
 
 class ClarifierModule(dspy.Module):
     """A DSPy module for clarifying user tasks."""
@@ -117,15 +125,16 @@ def main():
             if principle in questions_lower:
                 addressed_principles += 1
         
-        # Also check for numbered questions (format indicator)
-        has_numbered_questions = ('1.' in predicted_questions and '2.' in predicted_questions)
+        # Check for proper formatting (either numbered or bold headers)
+        has_proper_format = (('1.' in predicted_questions and '2.' in predicted_questions) or 
+                            ('**OBJECTIVE:**' in predicted_questions and '**SCOPE:**' in predicted_questions))
         
-        # Pass if we address at least 3 principles and have numbered format
-        is_valid = addressed_principles >= 3 and has_numbered_questions
+        # Pass if we address at least 3 principles and have proper format
+        is_valid = addressed_principles >= 3 and has_proper_format
         
         print(f"\n--- Validation: {example.user_request[:50]}... ---")
         print(f"Addressed principles: {addressed_principles}/4")
-        print(f"Numbered format: {has_numbered_questions}")
+        print(f"Proper format: {has_proper_format}")
         print(f"Validation result: {is_valid}")
         
         return is_valid
